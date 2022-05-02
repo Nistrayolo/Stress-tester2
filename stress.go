@@ -19,7 +19,6 @@ import (
 	"strconv"
 	"sync"
 	"time"
-	"github.com/cardigann/go-cloudflare-scraper"
 )
 
 //Start of Random useragent
